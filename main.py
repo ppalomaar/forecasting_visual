@@ -126,3 +126,13 @@ elif selected == "Evaluasi":
     col1, col2 = st.columns(2)
     col1.metric("RMSE", f"{rmse:.2f}")
     col2.metric("MAPE", f"{mape:.2f}%")
+
+    st.markdown("---")
+
+    st.write("""
+    **Penjelasan:**
+
+    - RMSE menunjukkan besar rata-rata error dalam satuan asli (rupiah).
+    - MAPE menunjukkan besar error dalam persen.
+    Semakin kecil nilainya, semakin baik model.
+    """)
