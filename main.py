@@ -66,39 +66,42 @@ elif selected == "Harga Minyak Mentah":
 
 elif selected == "Forecast":
     st.subheader("Visualisasi Forecast")
-        
-    # 1. Menyiapkan Data Forecast Mingguan
-    df_weekly = forecast[['Forecast_ARIMAX']].resample('W').first()
+           
+    # 1. Menyiapkan data grouping mingguan untuk label dropdown
+    df_weekly = forecast.copy()
     df_weekly['Month'] = df_weekly.index.strftime('%B')
-    df_weekly['Week_Num'] = df_weekly.groupby('Month').cumcount() + 1
-    df_weekly['Label'] = df_weekly['Month'] + " Minggu ke-" + df_weekly['Week_Num'].astype(str)
+    # Membuat index minggu per bulan
+    df_weekly['Week_Num'] = df_weekly.index.to_series().dt.to_period('W').factorize()[0] 
+    # Label kustom: "Oktober Minggu ke-1"
+    df_weekly['Label'] = df_weekly.index.strftime('%B') + " Minggu ke-" + (df_weekly.groupby('Month')['Week_Num'].transform('dense')).astype(str)
     
-    # Filter Dropdown (Bisa pilih satu atau lebih minggu)
-    selected_weeks = st.multiselect("Pilih Periode Mingguan untuk Ditampilkan:", df_weekly['Label'].tolist(), default=df_weekly['Label'].tolist()[-4:])
+    # Dropdown untuk pilih minggu
+    selected_week = st.selectbox("Pilih Periode Mingguan:", df_weekly['Label'].unique())
     
-    # Filter data berdasarkan pilihan
-    filtered_df = df_weekly[df_weekly['Label'].isin(selected_weeks)]
+    # Filter data berdasarkan label yang dipilih
+    filtered_df = df_weekly[df_weekly['Label'] == selected_week]
     
-    # Grafik Garis Forecast
-    if not filtered_df.empty:
-        fig1 = go.Figure(go.Scatter(
-            x=filtered_df['Label'], 
-            y=filtered_df['Forecast_ARIMAX'], 
-            mode='lines+markers', 
-            name='Forecast',
-            line=dict(width=3, color='#636EFA')
-        ))
-        fig1.update_layout(
-            title="Tren Forecast Nilai Tukar (Mingguan)", 
-            yaxis_title="Nilai Tukar (Rp)", 
-            template="plotly_white"
-        )
-        st.plotly_chart(fig1, use_container_width=True)
-    else:
-        st.warning("Silakan pilih setidaknya satu minggu.")
+    # 2. Grafik Garis Forecast (Harian)
+    fig1 = go.Figure(go.Scatter(
+        x=filtered_df.index.strftime('%d %b'), # Format tanggal harian (1 Okt, 2 Okt, dst)
+        y=filtered_df['Forecast_ARIMAX'], 
+        mode='lines+markers', 
+        name='Forecast',
+        line=dict(width=3, color='#636EFA')
+    ))
+    
+    fig1.update_layout(
+        title=f"Tren Forecast Harian: {selected_week}", 
+        xaxis_title="Tanggal",
+        yaxis_title="Nilai Tukar (Rp)", 
+        template="plotly_white",
+        hovermode="x unified"
+    )
+    st.plotly_chart(fig1, use_container_width=True)
 
     st.markdown("---")
     
+    # 3. Grafik Perbandingan & Tabel tetap sama seperti sebelumnya...
     # 2. Grafik Perbandingan (Aktual vs Forecast)
     st.subheader("Perbandingan Actual vs Forecast (Keseluruhan)")
     fig2 = go.Figure()
