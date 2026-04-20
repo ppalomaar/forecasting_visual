@@ -66,27 +66,45 @@ elif selected == "Harga Minyak Mentah":
 
 elif selected == "Forecast":
     st.subheader("Visualisasi Forecast")
+        
+    # 1. Menyiapkan Data Forecast Mingguan
+    df_weekly = forecast[['Forecast_ARIMAX']].resample('W').first()
+    df_weekly['Month'] = df_weekly.index.strftime('%B')
+    df_weekly['Week_Num'] = df_weekly.groupby('Month').cumcount() + 1
+    df_weekly['Label'] = df_weekly['Month'] + " Minggu ke-" + df_weekly['Week_Num'].astype(str)
     
-    # 1. Grafik Forecast Mingguan (Dropdown Filter)
-    df_weekly = forecast[['Forecast_ARIMAX']].resample('W').mean()
-    df_weekly['Label'] = df_weekly.index.strftime('%B %Y - Minggu ke-%U')
+    # Filter Dropdown (Bisa pilih satu atau lebih minggu)
+    selected_weeks = st.multiselect("Pilih Periode Mingguan untuk Ditampilkan:", df_weekly['Label'].tolist(), default=df_weekly['Label'].tolist()[-4:])
     
-    selected_week = st.selectbox("Pilih Periode Mingguan:", df_weekly['Label'].unique())
-    filtered_data = df_weekly[df_weekly['Label'] == selected_week]
+    # Filter data berdasarkan pilihan
+    filtered_df = df_weekly[df_weekly['Label'].isin(selected_weeks)]
     
-    fig1 = go.Figure(go.Scatter(x=[selected_week], y=filtered_data['Forecast_ARIMAX'], mode='markers+text', 
-                                name='Forecast', marker=dict(size=15), text=filtered_data['Forecast_ARIMAX'].round(0), textposition="top center"))
-    fig1.update_layout(title=f"Forecast Mingguan: {selected_week}", yaxis_title="Nilai Tukar", template="plotly_white")
-    st.plotly_chart(fig1, use_container_width=True)
-    
+    # Grafik Garis Forecast
+    if not filtered_df.empty:
+        fig1 = go.Figure(go.Scatter(
+            x=filtered_df['Label'], 
+            y=filtered_df['Forecast_ARIMAX'], 
+            mode='lines+markers', 
+            name='Forecast',
+            line=dict(width=3, color='#636EFA')
+        ))
+        fig1.update_layout(
+            title="Tren Forecast Nilai Tukar (Mingguan)", 
+            yaxis_title="Nilai Tukar (Rp)", 
+            template="plotly_white"
+        )
+        st.plotly_chart(fig1, use_container_width=True)
+    else:
+        st.warning("Silakan pilih setidaknya satu minggu.")
+
     st.markdown("---")
     
-    # 2. Grafik Aktual vs Forecast
-    st.subheader("Perbandingan Actual vs Forecast")
+    # 2. Grafik Perbandingan (Aktual vs Forecast)
+    st.subheader("Perbandingan Actual vs Forecast (Keseluruhan)")
     fig2 = go.Figure()
-    fig2.add_trace(go.Scatter(x=forecast.index, y=forecast['Actual'], name='Actual'))
-    fig2.add_trace(go.Scatter(x=forecast.index, y=forecast['Forecast_ARIMAX'], name='Forecast', line=dict(dash='dash')))
-    fig2.update_layout(title="Perbandingan Nilai Aktual dan Forecast", template="plotly_white")
+    fig2.add_trace(go.Scatter(x=forecast.index, y=forecast['Actual'], name='Actual', line=dict(color='gray')))
+    fig2.add_trace(go.Scatter(x=forecast.index, y=forecast['Forecast_ARIMAX'], name='Forecast', line=dict(dash='dash', color='#636EFA')))
+    fig2.update_layout(template="plotly_white")
     st.plotly_chart(fig2, use_container_width=True)
     
     # 3. Tabel
