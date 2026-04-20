@@ -45,10 +45,10 @@ with st.sidebar:
 if selected == "Home":
     st.write("##")
     st.markdown("""
-        <h1 style='text-align: center; font-size: 50px;'>Advanced Forecasting,<br>for Currency Analysis.</h1>
+        <h1 style='text-align: center; font-size: 50px;'>Peramalan Nilai Tukar IDR-USD,<br>Oktober - Desember 2025.</h1>
         <p style='text-align: center; font-size: 20px; color: #666;'>
-            Get access to state-of-the-art ARIMAX machine learning engines <br> 
-            that forecast USD to IDR time-series data.
+            Menyediakan layanan peramalan nilai tukar USD ke Rupiah <br> 
+            menggunakan model ARIMAX berdasarkan data hsitoris.
         </p>
     """, unsafe_allow_html=True)
     st.write("##")
@@ -108,8 +108,8 @@ elif selected == "Forecast":
     # Perbandingan
     st.subheader("Perbandingan Actual vs Forecast")
     fig2 = go.Figure()
-    fig2.add_trace(go.Scatter(x=forecast.index, y=forecast['Actual'], name='Actual', line=dict(color='gray')))
-    fig2.add_trace(go.Scatter(x=forecast.index, y=forecast['Forecast_ARIMAX'], name='Forecast', line=dict(dash='dash', color='#636EFA')))
+    fig2.add_trace(go.Scatter(x=forecast.index, y=forecast['Actual'], name='Actual', line=dict(color='#636EFA')))
+    fig2.add_trace(go.Scatter(x=forecast.index, y=forecast['Forecast_ARIMAX'], name='Forecast', line=dict(dash='dash', color="#FF2D2D")))
     fig2.update_layout(template="plotly_white")
     st.plotly_chart(fig2, use_container_width=True)
     
