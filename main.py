@@ -12,8 +12,9 @@ st.set_page_config(
 )
 
 # ======================
-# LOAD DATA (Pastikan file berada di folder yang sama)
+# LOAD DATA 
 # ======================
+# Pastikan file CSV berada di folder yang sama dengan script ini
 kurs = pd.read_csv("kurs.csv")
 minyak = pd.read_csv("minyak.csv")
 forecast = pd.read_csv("hasil_forecast_arimax_finall.csv")
@@ -48,8 +49,36 @@ with st.sidebar:
 # ======================
 
 if selected == "Home":
-    st.title("Dashboard Peramalan Nilai Tukar Rupiah")
-    st.write("Dashboard ini menampilkan analisis dan peramalan nilai tukar Rupiah terhadap USD menggunakan model ARIMAX.")
+    # Hero Section
+    with st.container():
+        st.write("##")
+        st.markdown("""
+            <h1 style='text-align: center; font-size: 50px;'>Advanced Forecasting,<br>for Currency Analysis.</h1>
+            <p style='text-align: center; font-size: 20px; color: #666;'>
+                Get access to state-of-the-art ARIMAX machine learning engines <br> 
+                that forecast USD to IDR time-series data.
+            </p>
+        """, unsafe_allow_html=True)
+        
+        st.write("##")
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            if st.button("🚀 Jelajahi Dashboard", use_container_width=True):
+                st.info("Silakan pilih menu di sidebar untuk melihat analisis lebih lanjut!")
+
+        st.write("---")
+        
+        # Penjelasan Proyek
+        st.subheader("Tentang Proyek Ini")
+        st.write("""
+        Dashboard ini dikembangkan sebagai alat bantu analisis untuk melakukan peramalan 
+        **Nilai Tukar Rupiah terhadap USD** dengan mengintegrasikan variabel eksternal berupa **Harga Minyak Mentah Dunia**. 
+        
+        **Fitur Utama:**
+        * **Analisis Data Historis:** Memantau tren pergerakan nilai tukar dan harga minyak dari tahun 2019-2025.
+        * **Model ARIMAX:** Menggunakan teknik statistik tingkat lanjut untuk memprediksi nilai tukar dengan akurasi tinggi.
+        * **Evaluasi Akurasi:** Transparansi perhitungan error model menggunakan metrik RMSE dan MAPE.
+        """)
 
 elif selected == "Nilai Tukar Rupiah":
     st.subheader("Grafik Nilai Tukar Rupiah")
