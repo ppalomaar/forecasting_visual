@@ -13,7 +13,7 @@ st.set_page_config(page_title="Dashboard Forecast Nilai Tukar", layout="wide")
 # ======================
 kurs = pd.read_csv("Data_Historis_Minyak_2019.csv")
 minyak = pd.read_csv("Data_Historis_USD_IDR_2019.csv")
-forecast = pd.read_csv("hasil_forecast_arimax_finall.csv")
+forecast = pd.read_csv("hasil_forecast_arimax_fix.csv")
 
 kurs['Tanggal'] = pd.to_datetime(kurs['Tanggal'])
 minyak['Date'] = pd.to_datetime(minyak['Date'])
